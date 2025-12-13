@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Створити пост</title>
+    <style>
+        body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        button { margin-top: 20px; padding: 10px 20px; background: green; color: white; border: none; cursor: pointer; font-size: 16px; }
+    </style>
+</head>
+<body>
+    <h1>Новий пост</h1>
+    <form action="/posts" method="POST">
+        <label>Заголовок:</label>
+        <input type="text" name="title" required>
+
+        <label>Автор:</label>
+        <input type="text" name="author" required>
+
+        <label>Текст:</label>
+        <textarea name="description" rows="5" required></textarea>
+
+        <button type="submit">Зберегти</button>
+    </form>
+    <br>
+    <a href="/">Назад на головну</a>
+</body>
+</html>
