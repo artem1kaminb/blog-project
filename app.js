@@ -4,46 +4,47 @@ const Post = require('./models/postModel');
 
 const app = express();
 
-// --- ВАЖЛИВО: Встав сюди свій рядок підключення знову ---
+app.set('view engine', 'ejs');
+app.use(express.urlencoded({ extended: true }));
+
+// --- ВАЖЛИВО: Встав сюди свій рядок підключення ---
+// Перевір, чи правильний пароль!
 const dbURI = 'mongodb+srv://manvelart231_db_user:jSexQ33HpreoYhDf@cluster0.iifflu5.mongodb.net/?appName=Cluster0' 
 
+// 1. Спочатку запускаємо сервер (щоб Render бачив, що ми живі)
+// Render видає свій порт у process.env.PORT, якщо його немає - беремо 3000
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+    console.log(`Сервер працює на порту ${PORT}`);
+});
+
+// 2. Потім підключаємося до бази
 mongoose.connect(dbURI)
-  .then((result) => {
-    console.log('Connected to DB');
-    app.listen(3000, () => {
-      console.log('Сервер працює на http://localhost:3000');
-    });
-  })
-  .catch((err) => console.log(err));
+  .then(() => console.log('Connected to DB'))
+  .catch((err) => console.log('DB Connection Error:', err));
 
-app.set('view engine', 'ejs');
-
-// Цей рядок дозволяє серверу розуміти дані з форми (те, що ти вводиш)
-app.use(express.urlencoded({ extended: true }));
 
 // --- МАРШРУТИ ---
 
-// 1. Головна сторінка (показує список)
 app.get('/', (req, res) => {
-  Post.find().sort({ createdAt: -1 }) // Знайти всі пости і посортувати (нові зверху)
+  Post.find().sort({ createdAt: -1 })
     .then((result) => {
-      res.render('index', { posts: result }); // Відмалювати index.ejs і передати туди пости
+      res.render('index', { posts: result });
     })
-    .catch((err) => console.log(err));
+    .catch((err) => {
+        console.log(err);
+        res.send("Помилка завантаження постів: " + err.message);
+    });
 });
 
-// 2. Сторінка додавання (показує форму)
 app.get('/add-post', (req, res) => {
   res.render('create');
 });
 
-// 3. Обробка форми (зберігає пост в базу)
 app.post('/posts', (req, res) => {
-  const post = new Post(req.body); // Створюємо об'єкт з даних форми
-
-  post.save() // Зберігаємо в MongoDB
-    .then((result) => {
-      res.redirect('/'); // Повертаємо користувача на головну
-    })
+  const post = new Post(req.body);
+  post.save()
+    .then(() => res.redirect('/'))
     .catch((err) => console.log(err));
 });
