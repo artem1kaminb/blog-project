@@ -6,7 +6,7 @@ const User = require('./models/userModel');
 const Post = require('./models/postModel');
 require('dotenv').config();
 
-// --- 🛡️ ІМПОРТ ЗАХИСТУ (НОВЕ) ---
+// ---  ІМПОРТ ЗАХИСТУ  ---
 const helmet = require('helmet');
 //const mongoSanitize = require('express-mongo-sanitize');
 //const xss = require('xss-clean');
@@ -28,7 +28,6 @@ const postSchema = Joi.object({
     title: Joi.string().min(3).max(100).required(), // Заголовок не довше 100 букв
     description: Joi.string().min(5).required()     // Текст хоча б 5 букв
 });
-// НАЛАШТУВАННЯ ЗАХИСТУ (ВСТАВ ЦЕ ВІДРАЗУ ПІСЛЯ const app = express()) ---
 
 // 1. Helmet (Захищає заголовки). 
 // Вимикаємо CSP, щоб не блокував твої скрипти темної теми
@@ -51,16 +50,13 @@ app.use(limiter);
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
+
+
 // 3. Data Sanitization (Проти NoSQL Injection)
 // Не дає хакерам увійти без пароля через {"$gt": ""}
-
-
-
 //app.use(mongoSanitize());
 // Налаштування сесії (щоб пам'ятати користувача)
 // Налаштування сесії (ЗАХИЩЕНЕ)
-
-
 // Перетворює <script>alert(1)</script> на безпечний текст
 //app.use(xss());
 
