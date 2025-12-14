@@ -10,7 +10,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  // --- НОВЕ ПОЛЕ ---
   role: {
     type: String, 
     default: 'user' // За замовчуванням усі — звичайні користувачі

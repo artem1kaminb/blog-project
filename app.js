@@ -1,10 +1,10 @@
-const session = require('express-session'); // <--- ДОДАЙ ЦЕ
-const User = require('./models/userModel'); // <--- ДОДАЙ ЦЕ (імпорт нової моделі)
+const session = require('express-session'); 
+const User = require('./models/userModel');
 const express = require('express');
 const mongoose = require('mongoose');
 const Post = require('./models/postModel');
 const bcrypt = require('bcrypt');
-
+require('dotenv').config();
 const app = express();
 
 app.set('view engine', 'ejs');
@@ -25,9 +25,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// --- ВАЖЛИВО: Встав сюди свій рядок підключення ---
-// Перевір, чи правильний пароль!
-const dbURI = 'mongodb+srv://manvelart231_db_user:jSexQ33HpreoYhDf@cluster0.iifflu5.mongodb.net/?appName=Cluster0' 
+const dbURI = process.env.MONGO_URI;
 
 // --- АВТОРИЗАЦІЯ (Реєстрація та Вхід) ---
 
@@ -48,7 +46,6 @@ app.post('/register', async (req, res) => {
         // Шифруємо пароль
         const hashedPassword = await bcrypt.hash(password, 10);
         // Створюємо користувача
-// --- МАГІЯ: Якщо нікнейм "admin", даємо права адміна ---
         const role = (username === 'admin') ? 'admin' : 'user';
 
         const user = new User({ 
@@ -70,29 +67,27 @@ app.get('/login', (req, res) => {
 });
 
 // 4. Обробка входу
-// 4. Обробка входу (З ПІДКАЗКАМИ В КОНСОЛЬ)
 app.post('/login', async (req, res) => {
     try {
         const { username, password } = req.body;
-        console.log(`Пробуємо увійти як: ${username}`); // <--- Підказка 1
+        console.log(`Пробуємо увійти як: ${username}`); 
 
         // Шукаємо користувача
         const user = await User.findOne({ username });
         
         if (!user) {
-            console.log("Помилка: Такого користувача немає в базі!"); // <--- Підказка 2
+            console.log("Помилка: Такого користувача немає в базі!"); //  Підказка 2
             return res.render('login', { error: 'Такого користувача не існує. Спочатку зареєструйся!' });
         }
 
         // Перевіряємо пароль
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch) {
-            console.log("Помилка: Невірний пароль!"); // <--- Підказка 3
+            console.log("Помилка: Невірний пароль!"); // Підказка 3
             return res.render('login', { error: 'Невірний пароль' });
         }
 
-        // Успіх!
-        console.log(`Успішний вхід! Роль: ${user.role}`); // <--- Підказка 4
+        console.log(`Успішний вхід! Роль: ${user.role}`);
         req.session.userId = user._id;
         req.session.username = user.username;
         req.session.role = user.role;
@@ -118,13 +113,13 @@ app.listen(PORT, () => {
     console.log(`Сервер працює на порту ${PORT}`);
 });
 
-// 2. Потім підключаємося до бази
+// підключаємося до бази
 mongoose.connect(dbURI)
   .then(() => console.log('Connected to DB'))
   .catch((err) => console.log('DB Connection Error:', err));
 
 
-// --- МАРШРУТИ ---
+
 
 app.get('/', (req, res) => {
   Post.find().sort({ createdAt: -1 })
@@ -164,8 +159,7 @@ app.post('/posts', (req, res) => {
     .catch((err) => console.log(err));
 });
 
-// 2. Видалення поста (ТЕПЕР БЕЗПЕЧНЕ)
-// 2. Видалення поста (ОНОВЛЕНО ДЛЯ АДМІНА)
+// 2. Видалення поста 
 app.post('/posts/:id/delete', async (req, res) => {
     try {
         // Якщо користувач не увійшов - на вихід
@@ -175,10 +169,9 @@ app.post('/posts/:id/delete', async (req, res) => {
 
         const post = await Post.findById(req.params.id);
         
-        // --- ГОЛОВНА ЗМІНА ТУТ ---
-        // Ми перевіряємо: 
+
         // 1. Чи це власник поста (post.owner === userId)
-        // 2. АБО (||) чи це Адмін (role === 'admin')
+        // 2.  чи це Адмін (role === 'admin')
         if (post.owner.toString() === req.session.userId || req.session.role === 'admin') {
             await Post.findByIdAndDelete(req.params.id);
             console.log("Пост успішно видалено!");
@@ -219,7 +212,7 @@ app.post('/posts/:id/edit', async (req, res) => {
 
         const post = await Post.findById(req.params.id);
 
-        // Знову перевіряємо права перед збереженням
+        //  перевіряємо права перед збереженням
         if (post.owner.toString() === req.session.userId) {
             // Оновлюємо тільки заголовок і текст
             await Post.findByIdAndUpdate(req.params.id, {
@@ -236,7 +229,7 @@ app.post('/posts/:id/edit', async (req, res) => {
     }
 });
 
-// Запуск сервера (цей код має бути в самому низу)
+// Запуск сервера
 app.listen(3000, () => {
     console.log('Сервер запущено! Відкрий http://localhost:3000');
 });
