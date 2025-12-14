@@ -13,6 +13,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
+app.set('trust proxy', 1); // Довіряти проксі (потрібно для Render + Secure Cookies)
 
 const Joi = require('joi');
 
