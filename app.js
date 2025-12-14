@@ -30,7 +30,7 @@ const postSchema = Joi.object({
 });
 
 // 1. Helmet (Захищає заголовки). 
-// Вимикаємо CSP, щоб не блокував твої скрипти темної теми
+// Вимикаємо CSP, щоб не блокував  скрипти темної теми
 app.use(helmet({ contentSecurityPolicy: false }));
 
 // 2. Rate Limiting (Обмеження кількості запитів)
@@ -81,7 +81,7 @@ app.use((req, res, next) => {
   next();
 });
 
-const dbURI = process.env.MONGO_URI;
+const dbURI = process.env.MONGO_URI; // Ось тут має бути власна база даних 
 
 // --- АВТОРИЗАЦІЯ (Реєстрація та Вхід) ---
 
