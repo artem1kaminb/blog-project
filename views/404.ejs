@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Сторінку не знайдено | 404</title>
+    <style>
+        /* Ті самі змінні, що і на головній */
+        :root { --bg-color: #ffffff; --text-color: #333; --btn-bg: #007bff; --btn-text: #fff; }
+        .dark-mode { --bg-color: #1a1a1a; --text-color: #f0f0f0; --btn-bg: #0056b3; }
+        
+        body { 
+            font-family: sans-serif; 
+            background-color: var(--bg-color); 
+            color: var(--text-color); 
+            text-align: center; 
+            padding-top: 100px;
+            transition: 0.3s;
+        }
+        
+        h1 { font-size: 80px; margin: 0; color: orange; }
+        p { font-size: 20px; margin-bottom: 30px; }
+        
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: var(--btn-bg);
+            color: var(--btn-text);
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .btn:hover { opacity: 0.8; }
+    </style>
+</head>
+<body>
+
+    <h1>404</h1>
+    <h2>😕 Упс! Сторінку не знайдено</h2>
+    <p>Можливо, ви помилилися адресою або сторінку було видалено.</p>
+    
+    <a href="/" class="btn">⬅️ На головну</a>
+
+    <script>
+        // Підтримка теми (щоб не сліпило очі вночі)
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+    </script>
+</body>
+</html>

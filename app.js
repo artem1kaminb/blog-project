@@ -320,6 +320,13 @@ app.post('/posts/:id/edit', async (req, res) => {
     }
 });
 
+// --- ОБРОБКА ПОМИЛКИ 404
+app.use((req, res) => {
+    // status(404) каже браузеру, що сторінки немає 
+    // render('404') показує наш красивий файл
+    res.status(404).render('404');
+});
+
 // Запуск сервера
 app.listen(3000, () => {
     console.log('Сервер запущено! Відкрий http://localhost:3000');
