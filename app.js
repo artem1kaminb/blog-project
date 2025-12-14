@@ -9,7 +9,7 @@ require('dotenv').config();
 // --- 🛡️ ІМПОРТ ЗАХИСТУ (НОВЕ) ---
 const helmet = require('helmet');
 //const mongoSanitize = require('express-mongo-sanitize');
-const xss = require('xss-clean');
+//const xss = require('xss-clean');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
@@ -61,7 +61,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 // Перетворює <script>alert(1)</script> на безпечний текст
-app.use(xss());
+//app.use(xss());
 
 
 
