@@ -4,90 +4,47 @@
     <meta charset="UTF-8">
     <title>Створити пост</title>
     <style>
-        /* 1. Налаштування кольорів (Ті самі змінні, що і на головній) */
+        /* Стилі (залишаємо ті самі) */
         :root {
-            --bg-color: #ffffff;
-            --text-color: #333333;
-            --input-bg: #f9f9f9;
-            --border-color: #ddd;
-            --btn-bg: green;
-            --btn-text: #fff;
+            --bg-color: #ffffff; --text-color: #333333; --input-bg: #f9f9f9; --border-color: #ddd; --btn-bg: green; --btn-text: #fff;
         }
-
-        /* Темна тема */
         .dark-mode {
-            --bg-color: #1a1a1a;
-            --text-color: #f0f0f0;
-            --input-bg: #2d2d2d;
-            --border-color: #444;
-            --btn-bg: #006400; /* Трохи темніший зелений */
+            --bg-color: #1a1a1a; --text-color: #f0f0f0; --input-bg: #2d2d2d; --border-color: #444; --btn-bg: #006400;
         }
-
         body {
-            font-family: sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 20px;
-            /* Застосування змінних */
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s;
+            font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;
+            background-color: var(--bg-color); color: var(--text-color); transition: 0.3s;
         }
-
         label { display: block; margin-top: 10px; font-weight: bold; }
-
-        /* Стилі для полів вводу (щоб вони теж темніли) */
         input, textarea { 
-            width: 100%; 
-            padding: 8px; 
-            margin-top: 5px; 
-            box-sizing: border-box;
-            background-color: var(--input-bg);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
-            border-radius: 4px;
+            width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box;
+            background-color: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 4px;
         }
-
         button { 
-            margin-top: 20px; 
-            padding: 10px 20px; 
-            background: var(--btn-bg); 
-            color: var(--btn-text); 
-            border: none; 
-            cursor: pointer; 
-            font-size: 16px; 
-            border-radius: 4px;
+            margin-top: 20px; padding: 10px 20px; background: var(--btn-bg); color: var(--btn-text); border: none; cursor: pointer; font-size: 16px; border-radius: 4px;
         }
-
-        a {
-            color: var(--text-color);
-            text-decoration: underline;
-        }
+        a { color: var(--text-color); text-decoration: underline; }
     </style>
 </head>
 <body>
     <h1>Новий пост</h1>
+    
     <form action="/posts" method="POST">
         <label>Заголовок:</label>
         <input type="text" name="title" required placeholder="Наприклад: Мій день">
-
-        <label>Автор:</label>
-        <input type="text" name="author" required placeholder="Твоє ім'я">
 
         <label>Текст:</label>
         <textarea name="description" rows="5" required placeholder="Напиши щось цікаве..."></textarea>
 
         <button type="submit">Зберегти</button>
     </form>
+    
     <br>
     <a href="/">⬅️ Назад на головну</a>
 
     <script>
         const body = document.body;
-        // Перевіряємо пам'ять браузера
         const currentTheme = localStorage.getItem('theme');
-        
-        // Якщо збережено 'dark', додаємо клас
         if (currentTheme === 'dark') {
             body.classList.add('dark-mode');
         }

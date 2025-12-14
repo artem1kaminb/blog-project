@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <title>Редагувати пост</title>
+    <style>
+        /* Ті самі стилі, що й усюди */
+        :root { --bg-color: #ffffff; --text-color: #333; --input-bg: #f9f9f9; --border-color: #ddd; --btn-bg: #ffa500; /* Помаранчевий для редагування */ --btn-text: #fff; }
+        .dark-mode { --bg-color: #1a1a1a; --text-color: #f0f0f0; --input-bg: #2d2d2d; --border-color: #444; --btn-bg: #cc8400; }
+        body { font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: var(--bg-color); color: var(--text-color); transition: 0.3s; }
+        label { display: block; margin-top: 10px; font-weight: bold; }
+        input, textarea { width: 100%; padding: 8px; margin-top: 5px; background: var(--input-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 4px; box-sizing: border-box;}
+        button { margin-top: 20px; padding: 10px 20px; background: var(--btn-bg); color: var(--btn-text); border: none; cursor: pointer; border-radius: 4px; font-size: 16px; }
+        a { color: var(--text-color); }
+    </style>
+</head>
+<body>
+    <h1>✏️ Редагувати пост</h1>
+    
+    <form action="/posts/<%= post._id %>/edit" method="POST">
+        
+        <label>Заголовок:</label>
+        <input type="text" name="title" required value="<%= post.title %>">
+
+        <label>Текст:</label>
+        <textarea name="description" rows="5" required><%= post.description %></textarea>
+
+        <button type="submit">Зберегти зміни</button>
+    </form>
+    
+    <br>
+    <a href="/">⬅️ Скасувати</a>
+
+    <script>
+        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+    </script>
+</body>
+</html>

@@ -4,90 +4,62 @@
     <meta charset="UTF-8">
     <title>Мій Блог</title>
     <style>
-        /* 1. Налаштування кольорів через змінні */
         :root {
-            --bg-color: #ffffff;
-            --text-color: #333333;
-            --card-bg: #f9f9f9;
-            --border-color: #ddd;
-            --btn-bg: #007BFF;
-            --btn-text: #fff;
+            --bg-color: #ffffff; --text-color: #333; --card-bg: #f9f9f9; --border-color: #ddd; --btn-bg: #007BFF;
         }
-
-        /* Клас для темної теми */
         .dark-mode {
-            --bg-color: #1a1a1a;
-            --text-color: #f0f0f0;
-            --card-bg: #2d2d2d;
-            --border-color: #444;
-            --btn-bg: #0056b3;
+            --bg-color: #1a1a1a; --text-color: #f0f0f0; --card-bg: #2d2d2d; --border-color: #444; --btn-bg: #0056b3;
         }
+        body { font-family: sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; background-color: var(--bg-color); color: var(--text-color); transition: 0.3s; }
+        
+        /* Гарне меню */
+        nav { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 15px; margin-bottom: 20px; }
+        .nav-links a { margin-left: 15px; text-decoration: none; color: var(--text-color); font-weight: bold; }
+        .nav-links a:hover { color: var(--btn-bg); }
 
-        body {
-            font-family: sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            /* Використовуємо змінні */
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            transition: background-color 0.3s, color 0.3s; /* Плавний перехід */
-        }
-
-        nav {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-        }
-
-        .post {
-            border: 1px solid var(--border-color);
-            background-color: var(--card-bg);
-            padding: 15px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-
-        .btn {
-            background: var(--btn-bg);
-            color: var(--btn-text);
-            padding: 10px 15px;
-            text-decoration: none;
-            display: inline-block;
-            border-radius: 5px;
-            border: none;
-            cursor: pointer;
-        }
-
-        /* Кнопка зміни теми */
-        #theme-toggle {
-            background: transparent;
-            border: 1px solid var(--text-color);
-            color: var(--text-color);
-            padding: 5px 10px;
-            cursor: pointer;
-            border-radius: 5px;
-            font-size: 1.2rem;
+        .post { border: 1px solid var(--border-color); background-color: var(--card-bg); padding: 15px; margin-bottom: 10px; border-radius: 5px; position: relative; }
+        .btn { background: var(--btn-bg); color: white; padding: 8px 12px; text-decoration: none; border-radius: 5px; display: inline-block; }
+        
+        /* Кнопка видалення */
+        .delete-btn {
+            background: #ff4d4d; color: white; border: none; padding: 5px 10px; cursor: pointer; border-radius: 4px; float: right;
         }
     </style>
 </head>
 <body>
     <nav>
-        <h1>Всі пости</h1>
-        <div>
-            <button id="theme-toggle">🌙</button>
-            <a href="/add-post" class="btn">➕ Додати пост</a>
+        <h1>🔥 Блог</h1>
+        <div class="nav-links">
+            <button id="theme-toggle" style="background:none; border:none; cursor:pointer; font-size:1.2rem;">🌙</button>
+            
+            <% if (user) { %>
+                <span>Привіт, <%= user %>! 👋</span>
+                <a href="/add-post" class="btn">➕ Пост</a>
+                <a href="/logout">Вийти</a>
+            <% } else { %>
+                <a href="/login">Увійти</a>
+                <a href="/register">Реєстрація</a>
+            <% } %>
         </div>
     </nav>
+
+    <h1>Стрічка новин</h1>
 
     <% if (posts.length > 0) { %>
         <% posts.forEach(post => { %>
             <div class="post">
+                <% if (typeof userId !== 'undefined' && ( (post.owner && userId === post.owner.toString()) || role === 'admin' ) ) { %>
+                    <% if (post.owner && userId === post.owner.toString()) { %>
+                        <a href="/posts/<%= post._id %>/edit" class="btn" style="background-color: orange; margin-right: 5px;">✏️</a>
+                    <% } %>
+
+                  <form action="/posts/<%= post._id %>/delete" method="POST" style="display:inline;">
+                        <button type="submit" class="delete-btn">🗑️</button>
+                    </form>
+                <% } %>
+
                 <h3><%= post.title %></h3>
-                <small>Автор: <%= post.author %></small>
+                <small>Автор: <strong><%= post.author %></strong></small>
                 <p><%= post.description %></p>
             </div>
         <% }) %>
@@ -96,29 +68,14 @@
     <% } %>
 
     <script>
-        // Знаходимо кнопку і тіло сторінки
-        const toggleBtn = document.getElementById('theme-toggle');
+        const btn = document.getElementById('theme-toggle');
         const body = document.body;
-
-        // Перевіряємо, чи є збережена тема в пам'яті
-        const currentTheme = localStorage.getItem('theme');
-        if (currentTheme === 'dark') {
-            body.classList.add('dark-mode');
-            toggleBtn.textContent = '☀️';
-        }
-
-        // Слухаємо клік по кнопці
-        toggleBtn.addEventListener('click', () => {
+        if(localStorage.getItem('theme') === 'dark') { body.classList.add('dark-mode'); btn.textContent = '☀️'; }
+        btn.addEventListener('click', () => {
             body.classList.toggle('dark-mode');
-
-            // Змінюємо іконку і зберігаємо вибір
-            if (body.classList.contains('dark-mode')) {
-                toggleBtn.textContent = '☀️';
-                localStorage.setItem('theme', 'dark');
-            } else {
-                toggleBtn.textContent = '🌙';
-                localStorage.setItem('theme', 'light');
-            }
+            const isDark = body.classList.contains('dark-mode');
+            btn.textContent = isDark ? '☀️' : '🌙';
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
         });
     </script>
 </body>
