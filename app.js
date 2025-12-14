@@ -8,7 +8,7 @@ require('dotenv').config();
 
 // --- 🛡️ ІМПОРТ ЗАХИСТУ (НОВЕ) ---
 const helmet = require('helmet');
-const mongoSanitize = require('express-mongo-sanitize');
+//const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const rateLimit = require('express-rate-limit');
 
@@ -55,7 +55,7 @@ app.use(express.urlencoded({ extended: true }));
 
 
 
-app.use(mongoSanitize());
+//app.use(mongoSanitize());
 // Налаштування сесії (щоб пам'ятати користувача)
 // Налаштування сесії (ЗАХИЩЕНЕ)
 
