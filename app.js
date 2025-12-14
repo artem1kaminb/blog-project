@@ -284,20 +284,33 @@ app.get('/posts/:id/edit', async (req, res) => {
 });
 
 // 2. Зберегти оновлений пост
+// 2. Зберегти оновлений пост (ВИПРАВЛЕНО: ТЕПЕР З ВАЛІДАЦІЄЮ)
 app.post('/posts/:id/edit', async (req, res) => {
     try {
         if (!req.session.userId) return res.redirect('/login');
 
+        // --- 1. ВАЛІДАЦІЯ (Закриваємо дірку в захисті) ---
+        // Перевіряємо новий текст тими ж правилами, що і при створенні
+        const { error } = postSchema.validate({ 
+            title: req.body.title, 
+            description: req.body.description 
+        });
+        
+        if (error) {
+            // Якщо текст задовгий або короткий - не зберігаємо
+            return res.send(`Помилка редагування: ${error.details[0].message} <br> <a href="/">На головну</a>`);
+        }
+
         const post = await Post.findById(req.params.id);
 
-        //  перевіряємо права перед збереженням
+        // --- 2. ЗБЕРЕЖЕННЯ ---
+        // Перевіряємо, чи це власник, і зберігаємо тільки якщо валідація пройшла успішно
         if (post.owner.toString() === req.session.userId) {
-            // Оновлюємо тільки заголовок і текст
             await Post.findByIdAndUpdate(req.params.id, {
                 title: req.body.title,
                 description: req.body.description
             });
-            console.log("Пост оновлено!");
+            console.log("Пост успішно оновлено!");
         }
         
         res.redirect('/');
