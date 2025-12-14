@@ -59,6 +59,15 @@
                 <% } %>
 
                 <h3><%= post.title %></h3>
+                <small style="float: right; color: gray; font-size: 12px;">
+                    📅 <%= new Date(post.createdAt).toLocaleString('uk-UA', { 
+                         day: 'numeric', 
+                         month: 'long', 
+                         year: 'numeric', 
+                        hour: '2-digit', 
+                        minute: '2-digit' 
+                   }) %>
+                </small>
                 <small>Автор: <strong><%= post.author %></strong></small>
                 <p><%= post.description %></p>
             </div>
