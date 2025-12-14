@@ -42,20 +42,29 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// 3. Data Sanitization (Проти NoSQL Injection)
-// Не дає хакерам увійти без пароля через {"$gt": ""}
-app.use(mongoSanitize());
 
-// Перетворює <script>alert(1)</script> на безпечний текст
-app.use(xss());
+
+
 
 // ---------------------------------------------
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
+// 3. Data Sanitization (Проти NoSQL Injection)
+// Не дає хакерам увійти без пароля через {"$gt": ""}
 
+
+
+app.use(mongoSanitize());
 // Налаштування сесії (щоб пам'ятати користувача)
 // Налаштування сесії (ЗАХИЩЕНЕ)
+
+
+// Перетворює <script>alert(1)</script> на безпечний текст
+app.use(xss());
+
+
+
 app.use(session({
   secret: process.env.SESSION_SECRET, // В ідеалі це теж треба сховати в .env, як і пароль до бази
   resave: false,
