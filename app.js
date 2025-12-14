@@ -1,20 +1,57 @@
-const session = require('express-session'); 
-const User = require('./models/userModel');
 const express = require('express');
 const mongoose = require('mongoose');
-const Post = require('./models/postModel');
+const session = require('express-session');
 const bcrypt = require('bcrypt');
+const User = require('./models/userModel');
+const Post = require('./models/postModel');
 require('dotenv').config();
+
+// --- 🛡️ ІМПОРТ ЗАХИСТУ (НОВЕ) ---
+const helmet = require('helmet');
+const mongoSanitize = require('express-mongo-sanitize');
+const xss = require('xss-clean');
+const rateLimit = require('express-rate-limit');
+
 const app = express();
+
+// НАЛАШТУВАННЯ ЗАХИСТУ (ВСТАВ ЦЕ ВІДРАЗУ ПІСЛЯ const app = express()) ---
+
+// 1. Helmet (Захищає заголовки). 
+// Вимикаємо CSP, щоб не блокував твої скрипти темної теми
+app.use(helmet({ contentSecurityPolicy: false }));
+
+// 2. Rate Limiting (Обмеження кількості запитів)
+// Якщо хтось довбатиме сайт більше 100 разів за 15 хв - його заблокує
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 хвилин
+  max: 100, // ліміт 100 запитів з одного IP
+  message: 'Забагато запитів з цієї IP-адреси, спробуйте пізніше.'
+});
+app.use(limiter);
+
+// 3. Data Sanitization (Проти NoSQL Injection)
+// Не дає хакерам увійти без пароля через {"$gt": ""}
+app.use(mongoSanitize());
+
+// Перетворює <script>alert(1)</script> на безпечний текст
+app.use(xss());
+
+// ---------------------------------------------
 
 app.set('view engine', 'ejs');
 app.use(express.urlencoded({ extended: true }));
 
 // Налаштування сесії (щоб пам'ятати користувача)
+// Налаштування сесії (ЗАХИЩЕНЕ)
 app.use(session({
-  secret: 'my secret key', // Секретний код для шифрування куків
+  secret: process.env.SESSION_SECRET, // В ідеалі це теж треба сховати в .env, як і пароль до бази
   resave: false,
-  saveUninitialized: false
+  saveUninitialized: false,
+  cookie: {
+    httpOnly: true, // Хакери не зможуть прочитати куки через JS
+    secure: process.env.NODE_ENV === 'production', // Працює тільки на HTTPS (на Render це буде true)
+    maxAge: 1000 * 60 * 60 * 24 // Сесія живе 1 добу
+  }
 }));
 
 // Проміжна функція: зберігаємо дані користувача для всіх сторінок
