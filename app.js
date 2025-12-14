@@ -14,6 +14,19 @@ const rateLimit = require('express-rate-limit');
 
 const app = express();
 
+const Joi = require('joi');
+
+// Правила для реєстрації
+const registerSchema = Joi.object({
+    username: Joi.string().alphanum().min(3).max(30).required(), // Тільки букви/цифри, від 3 до 30 символів
+    password: Joi.string().min(6).required() // Пароль мінімум 6 символів
+});
+
+// Правила для поста
+const postSchema = Joi.object({
+    title: Joi.string().min(3).max(100).required(), // Заголовок не довше 100 букв
+    description: Joi.string().min(5).required()     // Текст хоча б 5 букв
+});
 // НАЛАШТУВАННЯ ЗАХИСТУ (ВСТАВ ЦЕ ВІДРАЗУ ПІСЛЯ const app = express()) ---
 
 // 1. Helmet (Захищає заголовки). 
@@ -74,6 +87,13 @@ app.get('/register', (req, res) => {
 // 2. Обробка реєстрації
 app.post('/register', async (req, res) => {
     try {
+      // 1. ВАЛІДАЦІЯ (НОВЕ)
+        // Перевіряємо те, що прийшло (req.body) за нашими правилами
+        const { error } = registerSchema.validate(req.body);
+        if (error) {
+            // Якщо є помилка - сваримося і не пускаємо далі
+            return res.render('register', { error: error.details[0].message });
+        }
         const { username, password } = req.body;
         // Перевірка, чи існує користувач
         const existingUser = await User.findOne({ username });
@@ -179,6 +199,21 @@ app.get('/add-post', (req, res) => {
 
 // 1. Створення поста
 app.post('/posts', (req, res) => {
+  if (!req.session.userId) {
+        return res.redirect('/login');
+    }
+
+    // 1. ВАЛІДАЦІЯ (НОВЕ)
+    // Ми беремо з форми тільки title і description. Author і Owner ми беремо з сесії, їх перевіряти не треба.
+    const { error } = postSchema.validate({ 
+        title: req.body.title, 
+        description: req.body.description 
+    });
+    
+    if (error) {
+        // Тут ми просто повернемо помилку текстом, або можна зробити res.render('create', { error: ... })
+        return res.send(`Помилка: ${error.details[0].message} <br> <a href="/add-post">Назад</a>`);
+    }
   // Якщо користувач не увійшов - не даємо створити пост
   if (!req.session.userId) {
       return res.redirect('/login');
